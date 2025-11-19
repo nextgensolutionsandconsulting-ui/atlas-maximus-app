@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+  <rect width="256" height="256" fill="#1e3a8a"/>
+  <circle cx="128" cy="80" r="24" fill="#fbbf24"/>
+  <path d="M128 104 L108 140 L88 200 L108 200 L128 160 L148 200 L168 200 L148 140 Z" fill="#fbbf24"/>
+  <path d="M108 140 L80 160 L70 180 L90 190 L108 170 Z" fill="#fbbf24"/>
+  <path d="M148 140 L176 160 L186 180 L166 190 L148 170 Z" fill="#fbbf24"/>
+  <circle cx="128" cy="50" r="48" fill="#fbbf24" opacity="0.2"/>
+  <text x="128" y="60" font-family="Arial, sans-serif" font-size="40" font-weight="bold" fill="#1e3a8a" text-anchor="middle">AM</text>
+</svg>

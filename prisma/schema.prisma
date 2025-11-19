@@ -1,0 +1,1087 @@
+
+generator client {
+    provider = "prisma-client-js"
+    binaryTargets = ["native", "linux-musl-arm64-openssl-3.0.x"]
+    output = "/home/ubuntu/atlas_maximus_app/nextjs_space/node_modules/.prisma/client"
+}
+
+datasource db {
+    provider = "postgresql"
+    url      = env("DATABASE_URL")
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model User {
+  id                String             @id @default(cuid())
+  name              String?
+  email             String             @unique
+  password          String?            // For email/password auth
+  emailVerified     DateTime?
+  image             String?
+  fullName          String?
+  agileRole         AgileRole          @default(SCRUM_MASTER)
+  experienceLevel   ExperienceLevel    @default(INTERMEDIATE)
+  isAdmin           Boolean            @default(false)
+  subscriptionId    String?
+  subscriptionStatus SubscriptionStatus @default(INACTIVE)
+  subscriptionEndsAt DateTime?
+  ttsEnabled        Boolean            @default(true)
+  ttsVoice          String             @default("male-professional")
+  preferredMode     ConversationMode   @default(GUIDED_QUESTIONS)
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
+  
+  accounts          Account[]
+  sessions          Session[]
+  conversations     Conversation[]
+  documents         Document[]
+  feedback          Feedback[]
+  subscriptions     Subscription[]
+  contributions     UserContribution[]  @relation("UserContributions")
+  contributionVotes ContributionVote[]  @relation("ContributionVotes")
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+model Subscription {
+  id                String             @id @default(cuid())
+  userId            String             @unique
+  stripeCustomerId  String             @unique
+  stripeSubscriptionId String?         @unique
+  stripePriceId     String?
+  status            SubscriptionStatus @default(INACTIVE)
+  currentPeriodStart DateTime?
+  currentPeriodEnd  DateTime?
+  cancelAtPeriodEnd Boolean           @default(false)
+  canceledAt        DateTime?
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
+  
+  user              User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Conversation {
+  id          String    @id @default(cuid())
+  userId      String
+  title       String?
+  summary     String?
+  isActive    Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  messages    Message[]
+  documents   ConversationDocument[]
+}
+
+model Message {
+  id             String       @id @default(cuid())
+  conversationId String
+  content        String       @db.Text
+  role           MessageRole
+  audioUrl       String?      // For TTS audio files
+  metadata       Json?        // For additional data like citations, sources
+  createdAt      DateTime     @default(now())
+  
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+}
+
+model Document {
+  id                     String       @id @default(cuid())
+  userId                 String
+  originalName           String
+  cloudStoragePath       String       // S3 key
+  fileType               String
+  fileSize               Int
+  mimeType               String?
+  extractedText          String?      @db.Text
+  processingStatus       ProcessingStatus @default(PENDING)
+  processingError        String?
+  isSharedWithCommunity  Boolean      @default(true)  // Share knowledge with all users
+  isTemplate             Boolean      @default(false) // Mark as a template for replication
+  templateCategory       String?      // e.g., "Sprint Planning", "User Stories", "Retrospective"
+  usageCount             Int          @default(0)     // How many times referenced by Atlas
+  uploadedAt             DateTime     @default(now())
+  processedAt            DateTime?
+  
+  // Regulatory/Evidence Tracking
+  evidenceType           EvidenceType? // Type of evidence for compliance
+  evidenceTags           String[]      @default([]) // Additional tags for categorization
+  complianceNotes        String?       @db.Text // Notes for auditors
+  retentionPeriod        Int?          // Retention period in months
+  expiryDate             DateTime?     // When the evidence expires
+  lastAccessedAt         DateTime?     // Track when evidence was last accessed
+  accessCount            Int           @default(0) // Track access frequency for audit trails
+  
+  user                   User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  conversationRefs       ConversationDocument[]
+  auditTrailEntries      AuditTrailEntry[]
+  
+  @@index([isSharedWithCommunity])
+  @@index([isTemplate])
+  @@index([evidenceType])
+  @@index([userId, evidenceType])
+}
+
+// Audit Trail for Regulatory Compliance
+model AuditTrailEntry {
+  id              String       @id @default(cuid())
+  documentId      String?      // Optional: link to specific document
+  userId          String       // User who performed the action
+  actionType      AuditActionType
+  entityType      String       // e.g., "Document", "User", "Conversation"
+  entityId        String       // ID of the entity
+  details         Json?        // Additional details about the action
+  ipAddress       String?      // IP address of the user
+  userAgent       String?      // Browser/client info
+  timestamp       DateTime     @default(now())
+  
+  document        Document?    @relation(fields: [documentId], references: [id], onDelete: SetNull)
+  
+  @@index([userId, timestamp])
+  @@index([documentId, timestamp])
+  @@index([entityType, entityId])
+  @@index([actionType, timestamp])
+}
+
+model ConversationDocument {
+  id             String       @id @default(cuid())
+  conversationId String
+  documentId     String
+  addedAt        DateTime     @default(now())
+  
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  document       Document     @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  
+  @@unique([conversationId, documentId])
+}
+
+model Feedback {
+  id           String       @id @default(cuid())
+  userId       String
+  category     FeedbackCategory
+  subject      String
+  message      String       @db.Text
+  rating       Int?         // 1-5 rating scale
+  scenarioType String?      // Type of Agile scenario
+  isResolved   Boolean      @default(false)
+  adminNotes   String?      @db.Text
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+  
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model KnowledgeBase {
+  id          String   @id @default(cuid())
+  title       String   @unique
+  content     String   @db.Text
+  category    String
+  tags        String[] // Array of tags
+  source      String?  // Source URL or reference
+  isPublic    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model UserContribution {
+  id                String              @id @default(cuid())
+  userId            String
+  conversationId    String?
+  messageId         String?
+  contributionType  ContributionType
+  originalQuestion  String              @db.Text // The question that was asked
+  atlasResponse     String?             @db.Text // Atlas's original response (optional)
+  userExperience    String              @db.Text // User's experience/solution/feedback
+  scenario          String?             @db.Text // Context/scenario description
+  agileRole         AgileRole?          // Role of the contributor
+  tags              String[]            // Searchable tags
+  isHelpful         Boolean             @default(true)
+  helpfulCount      Int                 @default(0) // How many users found this helpful
+  usageCount        Int                 @default(0) // How many times used in responses
+  isApproved        Boolean             @default(true) // For moderation (auto-approved for now)
+  isPublic          Boolean             @default(true) // Share with all users
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime            @updatedAt
+  
+  user              User                @relation("UserContributions", fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@index([tags])
+  @@index([contributionType])
+  @@index([agileRole])
+  @@index([isPublic, isApproved])
+}
+
+model ContributionVote {
+  id               String   @id @default(cuid())
+  userId           String
+  contributionId   String
+  isHelpful        Boolean  // true = helpful, false = not helpful
+  createdAt        DateTime @default(now())
+  
+  user             User     @relation("ContributionVotes", fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@unique([userId, contributionId])
+}
+
+// Enums
+enum AgileRole {
+  SCRUM_MASTER
+  PRODUCT_OWNER
+  DEVELOPER
+  TESTER
+  AGILE_COACH
+  RELEASE_TRAIN_ENGINEER
+  SOLUTION_TRAIN_ENGINEER
+}
+
+enum ExperienceLevel {
+  BEGINNER         // New to Agile, learning fundamentals
+  INTERMEDIATE     // 1-3 years, comfortable with basics
+  ADVANCED         // 3-5 years, leading teams/initiatives
+  EXPERT           // 5+ years, coaching others, deep expertise
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  INACTIVE
+  TRIALING
+  PAST_DUE
+  CANCELED
+  UNPAID
+}
+
+enum ConversationMode {
+  DIRECT_ANSWERS
+  GUIDED_QUESTIONS
+}
+
+enum MessageRole {
+  USER
+  ASSISTANT
+  SYSTEM
+}
+
+enum ProcessingStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  FAILED
+}
+
+enum FeedbackCategory {
+  BUG_REPORT
+  FEATURE_REQUEST
+  SCENARIO_FEEDBACK
+  GENERAL
+  SUPPORT_REQUEST
+}
+
+enum ContributionType {
+  SOLUTION           // User shares how they solved a problem
+  EXPERIENCE         // User shares their experience with a practice
+  BEST_PRACTICE      // User shares a best practice or tip
+  LESSON_LEARNED     // User shares what they learned
+  REAL_WORLD_EXAMPLE // User shares a real-world example
+  ALTERNATIVE_APPROACH // User suggests a different way
+  FEEDBACK           // General feedback on Atlas's response
+}
+
+// Jira Data Models for "Ask Me Anything from Jira" Mode
+model JiraDataset {
+  id             String       @id @default(cuid())
+  userId         String
+  name           String       // User-friendly name like "Q4 Sprint Data"
+  description    String?
+  sourceType     DataSourceType @default(CSV_UPLOAD) // CSV, Excel, JQL, API
+  uploadedFile   String?      // Cloud storage path for uploaded file
+  issueCount     Int          @default(0)
+  isActive       Boolean      @default(true)
+  lastSyncedAt   DateTime?    // For API-based sync
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+  
+  issues         JiraIssue[]
+  
+  @@index([userId, isActive])
+}
+
+model JiraIssue {
+  id                String       @id @default(cuid())
+  datasetId         String
+  issueKey          String       // e.g., "PROJ-123"
+  summary           String       @db.Text
+  description       String?      @db.Text
+  issueType         String?      // Story, Bug, Epic, Task, etc.
+  status            String?      // To Do, In Progress, Done, etc.
+  priority          String?      // High, Medium, Low
+  storyPoints       Float?       // Can be decimal (0.5, 1, 2, 3, 5, 8, 13, etc.)
+  assignee          String?
+  reporter          String?
+  team              String?      // Team name or component
+  sprint            String?      // Sprint name
+  epic              String?      // Epic link
+  labels            String[]     // Array of labels
+  dueDate           DateTime?
+  createdDate       DateTime?
+  updatedDate       DateTime?
+  resolvedDate      DateTime?
+  customFields      Json?        // For additional custom fields
+  
+  dataset           JiraDataset  @relation(fields: [datasetId], references: [id], onDelete: Cascade)
+  
+  @@unique([datasetId, issueKey])
+  @@index([datasetId, status])
+  @@index([datasetId, team])
+  @@index([datasetId, sprint])
+  @@index([datasetId, assignee])
+}
+
+enum DataSourceType {
+  CSV_UPLOAD
+  EXCEL_UPLOAD
+  JQL_EXPORT
+  API_SYNC
+}
+
+// AI Coaching Companion Models
+model CoachingPlan {
+  id                String              @id @default(cuid())
+  userId            String              @unique
+  focusAreas        String[]            // e.g., ["Retrospective Quality", "Story AC", "Team Velocity"]
+  currentMaturityLevel MaturityLevel    @default(FORMING)
+  targetMaturityLevel  MaturityLevel    @default(PERFORMING)
+  generatedAt       DateTime            @default(now())
+  updatedAt         DateTime            @updatedAt
+  
+  observations      CoachingObservation[]
+  interventions     CoachingIntervention[]
+  assessments       MaturityAssessment[]
+}
+
+model CoachingObservation {
+  id                String              @id @default(cuid())
+  planId            String
+  category          ObservationCategory
+  severity          SeverityLevel       @default(MEDIUM)
+  title             String
+  description       String              @db.Text
+  dataSource        String?             // e.g., "Jira Sprint 42", "Uploaded Retrospective"
+  dataEvidence      Json?               // Specific data points that led to this observation
+  affectedAreas     String[]            // e.g., ["Sprint Planning", "User Stories"]
+  isResolved        Boolean             @default(false)
+  resolvedAt        DateTime?
+  createdAt         DateTime            @default(now())
+  
+  plan              CoachingPlan        @relation(fields: [planId], references: [id], onDelete: Cascade)
+  
+  @@index([planId, isResolved])
+}
+
+model CoachingIntervention {
+  id                String              @id @default(cuid())
+  planId            String
+  observationIds    String[]            // Links to observations that triggered this
+  title             String
+  description       String              @db.Text
+  actionItems       Json                // Array of specific actions to take
+  priority          PriorityLevel       @default(MEDIUM)
+  estimatedImpact   ImpactLevel         @default(MEDIUM)
+  estimatedEffort   EffortLevel         @default(MEDIUM)
+  status            InterventionStatus  @default(SUGGESTED)
+  startedAt         DateTime?
+  completedAt       DateTime?
+  notes             String?             @db.Text
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime            @updatedAt
+  
+  plan              CoachingPlan        @relation(fields: [planId], references: [id], onDelete: Cascade)
+  
+  @@index([planId, status])
+}
+
+model MaturityAssessment {
+  id                String              @id @default(cuid())
+  planId            String
+  assessmentType    AssessmentType
+  category          String              // e.g., "Sprint Planning", "Retrospectives", "User Stories"
+  currentScore      Float               // 0-100 scale
+  previousScore     Float?              // For trend analysis
+  maturityLevel     MaturityLevel
+  strengths         String[]            // What's working well
+  weaknesses        String[]            // Areas for improvement
+  recommendations   String[]            // Specific recommendations
+  dataAnalyzed      Json?               // Summary of data that was analyzed
+  createdAt         DateTime            @default(now())
+  
+  plan              CoachingPlan        @relation(fields: [planId], references: [id], onDelete: Cascade)
+  
+  @@index([planId, assessmentType])
+}
+
+// Enums for Coaching
+enum MaturityLevel {
+  FORMING         // Initial stage, team is just forming
+  STORMING        // Conflicts and disagreements emerge
+  NORMING         // Team begins to work cohesively
+  PERFORMING      // Team operates efficiently
+  TRANSFORMING    // Team innovates and adapts continuously
+}
+
+enum ObservationCategory {
+  RETROSPECTIVE_QUALITY
+  STORY_ACCEPTANCE_CRITERIA
+  SPRINT_PLANNING
+  DAILY_STANDUP
+  TEAM_VELOCITY
+  DEFINITION_OF_DONE
+  TECHNICAL_DEBT
+  STAKEHOLDER_ENGAGEMENT
+  TEAM_COLLABORATION
+  CONTINUOUS_IMPROVEMENT
+  RISK_MANAGEMENT
+  DEPENDENCY_MANAGEMENT
+}
+
+enum SeverityLevel {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+enum PriorityLevel {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+
+enum ImpactLevel {
+  LOW
+  MEDIUM
+  HIGH
+  TRANSFORMATIVE
+}
+
+enum EffortLevel {
+  LOW       // < 1 hour
+  MEDIUM    // 1-4 hours
+  HIGH      // 4-8 hours
+  VERY_HIGH // > 1 day
+}
+
+enum InterventionStatus {
+  SUGGESTED
+  IN_PROGRESS
+  COMPLETED
+  DEFERRED
+  NOT_APPLICABLE
+}
+
+enum AssessmentType {
+  INITIAL
+  QUARTERLY
+  SPRINT_BASED
+  AD_HOC
+  JIRA_ANALYSIS
+  DOCUMENT_ANALYSIS
+}
+
+// Regulatory/Evidence Tracker Enums
+enum EvidenceType {
+  AUDIT_REPORT           // External or internal audit reports
+  TRAINING_RECORD        // Training completion certificates, attendance
+  RISK_MITIGATION        // Risk assessment and mitigation plans
+  SPRINT_RETROSPECTIVE   // Retrospective notes for process improvement
+  COMPLIANCE_CHECKLIST   // Compliance verification checklists
+  SECURITY_SCAN          // Security scan results
+  CODE_REVIEW            // Code review documentation
+  TEST_EVIDENCE          // Test plans, results, coverage reports
+  CHANGE_CONTROL         // Change request and approval documentation
+  INCIDENT_REPORT        // Incident response and resolution
+  POLICY_DOCUMENT        // Policy and procedure documents
+  STAKEHOLDER_APPROVAL   // Sign-offs and approvals
+  QUALITY_METRIC         // Quality metrics and dashboards
+  CONTINUOUS_IMPROVEMENT // CI/CD evidence, automation logs
+  OTHER                  // Miscellaneous evidence
+}
+
+enum AuditActionType {
+  DOCUMENT_UPLOADED
+  DOCUMENT_VIEWED
+  DOCUMENT_DOWNLOADED
+  DOCUMENT_TAGGED
+  DOCUMENT_UPDATED
+  DOCUMENT_DELETED
+  EVIDENCE_EXPORTED
+  AUDIT_TRAIL_GENERATED
+  USER_LOGIN
+  USER_LOGOUT
+  SUBSCRIPTION_CREATED
+  SUBSCRIPTION_UPDATED
+  WORKFLOW_EXECUTED
+  JIRA_DATA_IMPORTED
+  REPORT_GENERATED
+}
+
+// Meeting Co-Pilot Models
+model Meeting {
+  id                  String              @id @default(cuid())
+  userId              String
+  title               String
+  meetingType         MeetingType
+  scheduledFor        DateTime?
+  duration            Int?                // Duration in minutes
+  status              MeetingStatus       @default(SCHEDULED)
+  agenda              Json?               // Generated agenda items
+  sprintContext       String?             // Current sprint info
+  piContext           String?             // PI planning context
+  jiraDatasetId       String?             // Link to Jira data for context
+  attendees           String[]            // List of attendee names/emails
+  location            String?             // Physical or virtual location
+  notes               String?             @db.Text // Meeting notes
+  actionItems         Json?               // Post-meeting action items
+  decisions           Json?               // Decisions made during the meeting
+  createdAt           DateTime            @default(now())
+  updatedAt           DateTime            @updatedAt
+  completedAt         DateTime?
+  
+  transcripts         MeetingTranscript[]
+  
+  @@index([userId, status])
+  @@index([userId, meetingType])
+}
+
+model MeetingTranscript {
+  id                  String              @id @default(cuid())
+  meetingId           String
+  speaker             String?             // Name of the speaker
+  content             String              @db.Text // What was said
+  timestamp           DateTime            @default(now())
+  isVoice             Boolean             @default(false) // Voice vs chat
+  
+  meeting             Meeting             @relation(fields: [meetingId], references: [id], onDelete: Cascade)
+  
+  @@index([meetingId, timestamp])
+}
+
+enum MeetingType {
+  SPRINT_PLANNING
+  DAILY_STANDUP
+  SPRINT_REVIEW
+  SPRINT_RETROSPECTIVE
+  PI_PLANNING
+  BACKLOG_REFINEMENT
+  TEAM_SYNC
+  STAKEHOLDER_DEMO
+  ARCHITECTURE_REVIEW
+  IMPEDIMENT_REMOVAL
+  ONE_ON_ONE
+  OTHER
+}
+
+enum MeetingStatus {
+  SCHEDULED
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+
+// Team Risk & Confidence Models
+model Team {
+  id                  String              @id @default(cuid())
+  userId              String              // Team owner/manager
+  name                String
+  description         String?
+  jiraDatasetId       String?             // Optional link to Jira data
+  members             String[]            // Array of team member names
+  sprintLength        Int                 @default(14) // Sprint length in days
+  currentSprint       String?
+  isActive            Boolean             @default(true)
+  createdAt           DateTime            @default(now())
+  updatedAt           DateTime            @updatedAt
+  
+  confidenceVotes     TeamConfidenceVote[]
+  riskScores          TeamRiskScore[]
+  objectives          TeamObjective[]
+  metrics             TeamMetric[]
+  
+  @@index([userId, isActive])
+}
+
+model TeamConfidenceVote {
+  id                  String              @id @default(cuid())
+  teamId              String
+  sprint              String              // Sprint name/number
+  objective           String              // What they're committing to
+  confidenceLevel     Int                 // 1-5 scale (1=low confidence, 5=high confidence)
+  votedBy             String              // Team member name
+  votedAt             DateTime            @default(now())
+  notes               String?             @db.Text
+  
+  team                Team                @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  
+  @@index([teamId, sprint])
+}
+
+model TeamObjective {
+  id                  String              @id @default(cuid())
+  teamId              String
+  sprint              String
+  title               String
+  description         String?             @db.Text
+  businessValue       Int?                // Business value points
+  status              ObjectiveStatus     @default(PLANNED)
+  healthScore         Float?              // 0-100 health score
+  riskLevel           RiskLevel?
+  createdAt           DateTime            @default(now())
+  updatedAt           DateTime            @updatedAt
+  completedAt         DateTime?
+  
+  team                Team                @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  
+  @@index([teamId, sprint, status])
+}
+
+model TeamMetric {
+  id                  String              @id @default(cuid())
+  teamId              String
+  sprint              String
+  metricType          MetricType
+  value               Float
+  target              Float?              // Optional target value
+  trend               TrendDirection?     // UP, DOWN, STABLE
+  recordedAt          DateTime            @default(now())
+  notes               String?             @db.Text
+  
+  team                Team                @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  
+  @@index([teamId, sprint, metricType])
+}
+
+model TeamRiskScore {
+  id                  String              @id @default(cuid())
+  teamId              String
+  sprint              String
+  overallRiskScore    Float               // 0-100 (0=low risk, 100=high risk)
+  riskLevel           RiskLevel
+  confidenceScore     Float?              // Average confidence from votes
+  velocityScore       Float?              // Velocity trend analysis
+  throughputScore     Float?              // Throughput analysis
+  objectiveHealthScore Float?             // Objective completion health
+  factors             Json                // Detailed breakdown of risk factors
+  recommendations     String[]            // AI-generated recommendations
+  calculatedAt        DateTime            @default(now())
+  
+  team                Team                @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  
+  @@index([teamId, sprint])
+  @@index([riskLevel])
+}
+
+// Conversation Memory & Insights Models
+model ConversationSession {
+  id                  String              @id @default(cuid())
+  userId              String
+  sessionNumber       Int                 // Sequential session number for the user
+  title               String?             // Auto-generated or user-defined title
+  summary             String?             @db.Text // AI-generated summary
+  topics              String[]            // Key topics discussed
+  decisions           Json?               // Key decisions made
+  actionItems         Json?               // Action items identified
+  agileRole           AgileRole?          // Role context for the session
+  startedAt           DateTime            @default(now())
+  endedAt             DateTime?
+  messageCount        Int                 @default(0)
+  isActive            Boolean             @default(true)
+  
+  messages            SessionMessage[]
+  insights            ConversationInsight[]
+  
+  @@index([userId, isActive])
+  @@index([userId, sessionNumber])
+}
+
+model SessionMessage {
+  id                  String              @id @default(cuid())
+  sessionId           String
+  content             String              @db.Text
+  role                MessageRole
+  metadata            Json?               // Citations, sources, context
+  embedding           String?             // Vector embedding for semantic search
+  createdAt           DateTime            @default(now())
+  
+  session             ConversationSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  
+  @@index([sessionId, createdAt])
+}
+
+model ConversationInsight {
+  id                  String              @id @default(cuid())
+  sessionId           String
+  insightType         InsightType
+  title               String
+  content             String              @db.Text
+  relevance           Float               // 0-1 relevance score
+  extractedAt         DateTime            @default(now())
+  
+  session             ConversationSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  
+  @@index([sessionId, insightType])
+}
+
+model SessionSummary {
+  id                  String              @id @default(cuid())
+  userId              String
+  summaryType         SummaryType         // LAST_SESSION, LAST_N_SESSIONS, TOPIC_BASED
+  timeframe           String?             // e.g., "Last 3 sessions", "Last week"
+  sessions            String[]            // Array of session IDs
+  summary             String              @db.Text
+  keyTopics           String[]
+  keyDecisions        Json?
+  actionItems         Json?
+  trends              Json?               // Identified trends
+  generatedAt         DateTime            @default(now())
+  
+  @@index([userId, summaryType])
+}
+
+// Enums for Risk & Confidence
+enum ObjectiveStatus {
+  PLANNED
+  IN_PROGRESS
+  AT_RISK
+  BLOCKED
+  COMPLETED
+  ABANDONED
+}
+
+enum RiskLevel {
+  LOW
+  MODERATE
+  HIGH
+  CRITICAL
+}
+
+enum MetricType {
+  VELOCITY
+  THROUGHPUT
+  CYCLE_TIME
+  LEAD_TIME
+  COMPLETION_RATE
+  DEFECT_RATE
+  STORY_POINTS_COMPLETED
+  STORY_POINTS_COMMITTED
+  CONFIDENCE_AVERAGE
+  CUSTOM
+}
+
+enum TrendDirection {
+  UP
+  DOWN
+  STABLE
+}
+
+// Enums for Conversation Memory
+enum InsightType {
+  DECISION
+  ACTION_ITEM
+  KEY_TOPIC
+  BEST_PRACTICE
+  LESSON_LEARNED
+  IMPEDIMENT
+  RECOMMENDATION
+}
+
+enum SummaryType {
+  LAST_SESSION
+  LAST_N_SESSIONS
+  TOPIC_BASED
+  WEEKLY
+  MONTHLY
+}
+
+// Advanced Analytics Models
+model AnalyticsSnapshot {
+  id                    String              @id @default(cuid())
+  userId                String?             // Null for system-wide analytics
+  teamId                String?             // Null for user-level analytics
+  snapshotType          AnalyticsType
+  period                String              // e.g., "2024-10", "Sprint 42", "Q4 2024"
+  startDate             DateTime
+  endDate               DateTime
+  metrics               Json                // Flexible JSON for various metrics
+  trends                Json?               // Trend analysis data
+  predictions           Json?               // Predictive insights
+  generatedAt           DateTime            @default(now())
+  
+  @@index([userId, snapshotType, period])
+  @@index([teamId, snapshotType, period])
+  @@index([snapshotType, startDate])
+}
+
+model UserActivity {
+  id                    String              @id @default(cuid())
+  userId                String
+  activityType          ActivityType
+  entityType            String              // e.g., "Document", "Chat", "Query", "Risk"
+  entityId              String?
+  metadata              Json?               // Additional context
+  duration              Int?                // Duration in seconds
+  timestamp             DateTime            @default(now())
+  
+  @@index([userId, timestamp])
+  @@index([activityType, timestamp])
+  @@index([userId, activityType])
+}
+
+model QueryAnalytics {
+  id                    String              @id @default(cuid())
+  userId                String
+  query                 String              @db.Text
+  queryType             QueryType           @default(GENERAL)
+  responseTime          Int?                // Response time in ms
+  resultCount           Int?                // Number of results
+  wasHelpful            Boolean?
+  feedbackScore         Int?                // 1-5 rating
+  documentsReferenced   String[]            // Document IDs
+  timestamp             DateTime            @default(now())
+  
+  @@index([userId, timestamp])
+  @@index([queryType, timestamp])
+  @@index([wasHelpful])
+}
+
+// Team Collaboration Models
+model Workspace {
+  id                    String              @id @default(cuid())
+  name                  String
+  description           String?             @db.Text
+  ownerId               String              // User who created it
+  teamId                String?             // Optional link to team
+  isPublic              Boolean             @default(false)
+  allowedUsers          String[]            // Array of user IDs who have access
+  createdAt             DateTime            @default(now())
+  updatedAt             DateTime            @updatedAt
+  
+  messages              WorkspaceMessage[]
+  tasks                 CollaborativeTask[]
+  sharedDocuments       WorkspaceDocument[]
+  
+  @@index([ownerId])
+  @@index([teamId])
+}
+
+model WorkspaceMessage {
+  id                    String              @id @default(cuid())
+  workspaceId           String
+  userId                String
+  content               String              @db.Text
+  mentions              String[]            // User IDs mentioned
+  attachments           Json?               // File attachments metadata
+  isEdited              Boolean             @default(false)
+  editedAt              DateTime?
+  reactions             Json?               // Emoji reactions
+  threadParentId        String?             // For threaded conversations
+  createdAt             DateTime            @default(now())
+  
+  workspace             Workspace           @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  
+  @@index([workspaceId, createdAt])
+  @@index([userId, createdAt])
+  @@index([threadParentId])
+}
+
+model CollaborativeTask {
+  id                    String              @id @default(cuid())
+  workspaceId           String
+  title                 String
+  description           String?             @db.Text
+  assignedTo            String[]            // User IDs
+  createdBy             String              // User ID
+  status                TaskStatus          @default(TODO)
+  priority              TaskPriority        @default(MEDIUM)
+  dueDate               DateTime?
+  estimatedHours        Float?
+  tags                  String[]
+  checklist             Json?               // Checklist items
+  comments              Json?               // Task comments
+  completedAt           DateTime?
+  createdAt             DateTime            @default(now())
+  updatedAt             DateTime            @updatedAt
+  
+  workspace             Workspace           @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  
+  @@index([workspaceId, status])
+  @@index([createdBy])
+}
+
+model WorkspaceDocument {
+  id                    String              @id @default(cuid())
+  workspaceId           String
+  documentId            String              // Reference to main Document model
+  sharedBy              String              // User ID who shared
+  permissions           DocumentPermission  @default(VIEW)
+  annotations           Json?               // Collaborative annotations
+  sharedAt              DateTime            @default(now())
+  
+  workspace             Workspace           @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  
+  @@unique([workspaceId, documentId])
+  @@index([workspaceId])
+}
+
+model Notification {
+  id                    String              @id @default(cuid())
+  userId                String
+  notificationType      NotificationType
+  title                 String
+  message               String              @db.Text
+  actionUrl             String?             // Link to related item
+  metadata              Json?               // Additional context
+  isRead                Boolean             @default(false)
+  readAt                DateTime?
+  createdAt             DateTime            @default(now())
+  
+  @@index([userId, isRead, createdAt])
+  @@index([notificationType, createdAt])
+}
+
+model ActivityFeed {
+  id                    String              @id @default(cuid())
+  workspaceId           String?             // Null for global activity
+  teamId                String?             // Null for workspace activity
+  userId                String              // User who performed the action
+  actionType            FeedActionType
+  entityType            String              // e.g., "Task", "Message", "Document"
+  entityId              String
+  description           String              @db.Text
+  metadata              Json?
+  visibility            FeedVisibility      @default(WORKSPACE)
+  createdAt             DateTime            @default(now())
+  
+  @@index([workspaceId, createdAt])
+  @@index([teamId, createdAt])
+  @@index([userId, createdAt])
+  @@index([visibility, createdAt])
+}
+
+// Analytics Enums
+enum AnalyticsType {
+  USER_ENGAGEMENT
+  TEAM_PERFORMANCE
+  DOCUMENT_USAGE
+  QUERY_PATTERNS
+  RISK_TRENDS
+  VELOCITY_TRENDS
+  SPRINT_HEALTH
+  SYSTEM_WIDE
+}
+
+enum ActivityType {
+  CHAT_MESSAGE
+  DOCUMENT_UPLOAD
+  DOCUMENT_VIEW
+  QUERY_EXECUTED
+  RISK_ANALYZED
+  COACHING_ACCESSED
+  MEETING_CREATED
+  WORKSPACE_ACTIVITY
+  TASK_CREATED
+  TASK_COMPLETED
+}
+
+enum QueryType {
+  GENERAL
+  DOCUMENT_SPECIFIC
+  AGILE_METHODOLOGY
+  JIRA_DATA
+  RISK_ASSESSMENT
+  TEAM_PERFORMANCE
+}
+
+// Collaboration Enums
+enum TaskStatus {
+  TODO
+  IN_PROGRESS
+  IN_REVIEW
+  BLOCKED
+  DONE
+  CANCELLED
+}
+
+enum TaskPriority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+
+enum DocumentPermission {
+  VIEW
+  COMMENT
+  EDIT
+  ADMIN
+}
+
+enum NotificationType {
+  MENTION
+  TASK_ASSIGNED
+  TASK_COMPLETED
+  TASK_DUE_SOON
+  MESSAGE_REPLY
+  DOCUMENT_SHARED
+  WORKSPACE_INVITE
+  RISK_ALERT
+  SYSTEM_ANNOUNCEMENT
+}
+
+enum FeedActionType {
+  CREATED
+  UPDATED
+  DELETED
+  COMPLETED
+  COMMENTED
+  SHARED
+  MENTIONED
+}
+
+enum FeedVisibility {
+  PRIVATE
+  WORKSPACE
+  TEAM
+  PUBLIC
+}

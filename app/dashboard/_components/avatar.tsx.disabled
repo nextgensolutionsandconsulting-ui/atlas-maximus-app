@@ -1,0 +1,401 @@
+
+"use client"
+
+import { useState, useRef, useEffect } from "react"
+import { useSession } from "next-auth/react"
+import { Button } from "@/components/ui/button"
+import { Volume2, VolumeX } from "lucide-react"
+import { Card, CardContent } from "@/components/ui/card"
+
+interface AvatarProps {
+  isSpeaking: boolean
+  isVoiceMode: boolean
+  isListening?: boolean
+}
+
+// D-ID Agent web component type
+declare global {
+  namespace JSX {
+    interface IntrinsicElements {
+      'd-id-agent': any
+    }
+  }
+}
+
+export function Avatar({ isSpeaking, isVoiceMode, isListening = false }: AvatarProps) {
+  const { data: session } = useSession() || {}
+  const [isMuted, setIsMuted] = useState(false)
+  const [currentText, setCurrentText] = useState("")
+  const [isLoading, setIsLoading] = useState(false)
+  const [isFadingOut, setIsFadingOut] = useState(false)
+  const [isAgentReady, setIsAgentReady] = useState(false)
+  const [didConfig, setDidConfig] = useState<{ clientKey: string; agentId: string } | null>(null)
+  
+  const agentContainerRef = useRef<HTMLDivElement | null>(null)
+  const silenceTimeoutRef = useRef<NodeJS.Timeout | null>(null)
+  const speechQueueRef = useRef<string[]>([])
+  const isProcessingRef = useRef(false)
+  const scriptLoadedRef = useRef(false)
+
+  // Fetch D-ID configuration and initialize agent
+  useEffect(() => {
+    let cancelled = false
+    const scriptLoadedRef = { current: false }
+
+    async function ensureScript() {
+      if ((window as any).DIDAgent) return
+      if (scriptLoadedRef.current) return
+      scriptLoadedRef.current = true
+      await new Promise<void>((resolve, reject) => {
+        const s = document.createElement("script")
+        s.src = "https://agent.d-id.com/v1/index.js"
+        s.async = true
+        s.onload = () => resolve()
+        s.onerror = () => reject(new Error("Failed to load D-ID Agent script"))
+        document.head.appendChild(s)
+      })
+    }
+
+    async function getConfig() {
+      const r = await fetch("/api/d-id/config", { cache: "no-store" })
+      if (!r.ok) throw new Error(`Config ${r.status}: ${await r.text()}`)
+      return r.json() as Promise<{ agentId: string; clientKey: string }>
+    }
+
+    function wireEvents(el: any) {
+      const onReady = () => { console.log("[D-ID] ready"); setIsAgentReady(true); setIsLoading(false) }
+      const onOpen = () => console.log("[D-ID] open")
+      const onClose = (e: any) => {
+        console.warn("[D-ID] close", e?.detail)
+        // keep it visible if it tries to close itself
+        try { el.setAttribute("open", "") } catch {}
+      }
+      const onState = (e: any) => console.log("[D-ID] statechange", e?.detail)
+      const onError = (e: any) => {
+        console.error("[D-ID] error", e?.detail || e)
+        alert("Avatar error — see console for details")
+        setIsLoading(false)
+      }
+      el.addEventListener("ready", onReady)
+      el.addEventListener("open", onOpen)
+      el.addEventListener("close", onClose)
+      el.addEventListener("statechange", onState)
+      el.addEventListener("error", onError)
+      return () => {
+        el.removeEventListener("ready", onReady)
+        el.removeEventListener("open", onOpen)
+        el.removeEventListener("close", onClose)
+        el.removeEventListener("statechange", onState)
+        el.removeEventListener("error", onError)
+      }
+    }
+
+    async function init() {
+      try {
+        setIsLoading(true)
+        console.log("Fetching D-ID agent config…")
+        const { agentId, clientKey } = await getConfig()
+        if (cancelled) return
+
+        // Warm the mic permission once, before opening the widget (avoids silent closes)
+        try {
+          await navigator.mediaDevices.getUserMedia({ audio: true })
+          console.log("[D-ID] Microphone permission granted")
+          // user allowed mic or it's already granted
+        } catch (e) {
+          console.warn("[D-ID] Mic permission not granted yet", e)
+          // the widget can still open, but it may not be 'ready' to talk
+        }
+
+        await ensureScript()
+        if (cancelled) return
+
+        // Wait until the custom element is fully defined before setting credentials
+        await customElements.whenDefined("d-id-agent")
+        console.log("[D-ID] Custom element defined")
+
+        // create or reuse the element
+        let el = document.getElementById("atlas-did-agent") as any
+        if (!el) {
+          el = document.createElement("d-id-agent")
+          el.id = "atlas-did-agent"
+          // Keep it visible & show mic
+          el.setAttribute("open", "")
+          el.setAttribute("input", "voice")
+          el.setAttribute("background", "transparent")
+          // Optional layout
+          el.style.position = "fixed"
+          el.style.right = "24px"
+          el.style.bottom = "24px"
+          el.style.zIndex = "9999"
+          document.body.appendChild(el)
+        }
+
+        // *** set BOTH attributes and JS props ***
+        el.setAttribute("agent", agentId)
+        el.setAttribute("client-key", clientKey)
+        el.agent = agentId
+        el.clientKey = clientKey
+
+        const unwire = wireEvents(el)
+
+        // Wait up to 60s for readiness
+        const start = Date.now()
+        const tid = window.setInterval(() => {
+          if (cancelled) { window.clearInterval(tid); return }
+          if (el.ready) {
+            console.log("[D-ID] Agent ready")
+            setIsLoading(false)
+            window.clearInterval(tid)
+          } else if (Date.now() - start > 60000) {
+            console.error("[D-ID] Agent failed to become ready within 60s")
+            setIsLoading(false)
+            window.clearInterval(tid)
+            alert("Avatar loading timeout. Verify Agent ID & Client Key, microphone permission, and CSP")
+          }
+        }, 500)
+
+        return () => { window.clearInterval(tid); unwire?.() }
+      } catch (err) {
+        console.error("Failed to initialize D-ID Agent:", err)
+        setIsLoading(false)
+        alert("Could not initialize avatar — see console for details")
+      }
+    }
+
+    if (isVoiceMode) {
+      init()
+    }
+
+    return () => { 
+      cancelled = true 
+      // Cleanup on unmount
+      const agent = document.getElementById('atlas-did-agent')
+      if (agent) {
+        agent.remove()
+      }
+    }
+  }, [isVoiceMode])
+
+  // Auto fade-out after silence
+  useEffect(() => {
+    if (isSpeaking || isLoading || isListening) {
+      setIsFadingOut(false)
+    }
+
+    if (silenceTimeoutRef.current) {
+      clearTimeout(silenceTimeoutRef.current)
+      silenceTimeoutRef.current = null
+    }
+
+    if (!isSpeaking && !isLoading && !isListening && isVoiceMode) {
+      silenceTimeoutRef.current = setTimeout(() => {
+        setIsFadingOut(true)
+        setTimeout(() => {
+          window.dispatchEvent(new CustomEvent('atlas-voice-mode-off'))
+          setIsFadingOut(false)
+        }, 400)
+      }, 3000)
+    }
+
+    return () => {
+      if (silenceTimeoutRef.current) {
+        clearTimeout(silenceTimeoutRef.current)
+        silenceTimeoutRef.current = null
+      }
+    }
+  }, [isSpeaking, isLoading, isListening, isVoiceMode])
+
+  // Listen for speak events from Atlas Maximus chat
+  useEffect(() => {
+    const handleSpeakText = (event: CustomEvent) => {
+      const text = event.detail.text
+      addToQueue(text)
+    }
+
+    const handleStopSpeaking = () => {
+      stopSpeaking()
+    }
+
+    window.addEventListener('atlas-speak', handleSpeakText as EventListener)
+    window.addEventListener('atlas-stop-speaking', handleStopSpeaking as EventListener)
+    
+    return () => {
+      window.removeEventListener('atlas-speak', handleSpeakText as EventListener)
+      window.removeEventListener('atlas-stop-speaking', handleStopSpeaking as EventListener)
+    }
+  }, [isAgentReady])
+
+  const addToQueue = (text: string) => {
+    if (!text || isMuted || !isAgentReady) return
+    
+    speechQueueRef.current.push(text)
+    
+    if (!isProcessingRef.current) {
+      processNextInQueue()
+    }
+  }
+
+  const processNextInQueue = async () => {
+    if (speechQueueRef.current.length === 0) {
+      isProcessingRef.current = false
+      return
+    }
+
+    isProcessingRef.current = true
+    const text = speechQueueRef.current.shift()
+    
+    if (text) {
+      await speakText(text)
+    }
+    
+    // Process next after a small delay
+    setTimeout(() => processNextInQueue(), 500)
+  }
+
+  const speakText = async (text: string) => {
+    if (!text || isMuted || !isAgentReady) return
+
+    try {
+      setCurrentText(text)
+      console.log('Making Frank speak:', text.substring(0, 50) + '...')
+
+      // Get the D-ID agent element
+      const agentElement = document.getElementById('atlas-did-agent') as any
+      
+      if (agentElement && typeof agentElement.chat === 'function') {
+        // Send message to Frank using the chat method
+        await agentElement.chat(text)
+        console.log('Message sent to Frank successfully')
+      } else {
+        console.warn('D-ID agent element not found or chat method not available')
+      }
+      
+      // Estimate speech duration (rough estimate: 150 words per minute)
+      const words = text.split(' ').length
+      const estimatedDuration = (words / 150) * 60 * 1000 // in milliseconds
+      
+      // Clear current text after estimated duration
+      setTimeout(() => {
+        setCurrentText("")
+      }, estimatedDuration)
+
+    } catch (error) {
+      console.error("Frank speech error:", error)
+      setCurrentText("")
+    }
+  }
+
+  const stopSpeaking = () => {
+    speechQueueRef.current = []
+    isProcessingRef.current = false
+    setCurrentText("")
+  }
+
+  const toggleMute = () => {
+    setIsMuted(!isMuted)
+    if (!isMuted) {
+      stopSpeaking()
+    }
+  }
+
+  // Only show when voice mode is active
+  if (!isVoiceMode) {
+    return null
+  }
+
+  // Always show avatar indicator in upper right when voice mode is active
+  return (
+    <div className="fixed top-4 right-4 z-50">
+      <Card className={`
+        border-2 shadow-2xl backdrop-blur-xl transition-all duration-300
+        ${isSpeaking || currentText ? 'border-green-500/50 bg-gradient-to-br from-green-900/80 to-gray-800/80' : 
+          isListening ? 'border-blue-500/50 bg-gradient-to-br from-blue-900/80 to-gray-800/80' :
+          isLoading ? 'border-yellow-500/50 bg-gradient-to-br from-yellow-900/80 to-gray-800/80' :
+          'border-gray-500/30 bg-gradient-to-br from-gray-900/90 to-gray-800/90'}
+      `}>
+        <CardContent className="p-4">
+          <div className="flex items-center space-x-4">
+            {/* Avatar Image */}
+            <div className="relative">
+              <div className={`
+                w-16 h-16 rounded-full flex items-center justify-center text-3xl
+                transition-all duration-300
+                ${isSpeaking || currentText ? 'bg-gradient-to-br from-green-400 to-emerald-600 animate-pulse' : 
+                  isListening ? 'bg-gradient-to-br from-blue-400 to-indigo-600 animate-pulse' :
+                  isLoading ? 'bg-gradient-to-br from-yellow-400 to-orange-600' :
+                  'bg-gradient-to-br from-gray-600 to-gray-700'}
+              `}>
+                {isLoading ? (
+                  <div className="w-8 h-8 border-4 border-white border-t-transparent rounded-full animate-spin"></div>
+                ) : (
+                  <span className="text-white">🤖</span>
+                )}
+              </div>
+              {/* Status indicator ring */}
+              {(isSpeaking || currentText || isListening) && (
+                <div className="absolute inset-0 rounded-full border-4 border-white/30 animate-ping"></div>
+              )}
+            </div>
+
+            {/* Status Text */}
+            <div className="flex-1 min-w-0">
+              {isLoading ? (
+                <>
+                  <p className="text-white text-sm font-bold">Loading Avatar...</p>
+                  <p className="text-gray-300 text-xs">Powered by D-ID</p>
+                </>
+              ) : isSpeaking || currentText ? (
+                <>
+                  <div className="flex items-center space-x-2 mb-1">
+                    <div className="flex space-x-1">
+                      <div className="w-1 h-3 bg-green-300 rounded-full animate-pulse" style={{ animationDelay: '0ms' }}></div>
+                      <div className="w-1 h-4 bg-green-400 rounded-full animate-pulse" style={{ animationDelay: '150ms' }}></div>
+                      <div className="w-1 h-3 bg-green-300 rounded-full animate-pulse" style={{ animationDelay: '300ms' }}></div>
+                    </div>
+                    <p className="text-green-200 text-sm font-bold">Speaking</p>
+                  </div>
+                  {currentText && (
+                    <p className="text-gray-200 text-xs line-clamp-2 max-w-[200px]">
+                      {currentText}
+                    </p>
+                  )}
+                </>
+              ) : isListening ? (
+                <>
+                  <div className="flex items-center space-x-2">
+                    <div className="w-2 h-2 bg-blue-300 rounded-full animate-pulse"></div>
+                    <p className="text-blue-200 text-sm font-bold">Listening...</p>
+                  </div>
+                  <p className="text-gray-300 text-xs mt-1">Ready for your input</p>
+                </>
+              ) : (
+                <>
+                  <p className="text-white text-sm font-bold">Atlas Ready</p>
+                  <p className="text-gray-300 text-xs">Voice mode active</p>
+                </>
+              )}
+            </div>
+
+            {/* Mute toggle button */}
+            <Button
+              size="sm"
+              variant={isMuted ? "destructive" : "ghost"}
+              className={`
+                flex-shrink-0 h-8 w-8 p-0 rounded-full
+                ${!isMuted ? 'hover:bg-white/10' : ''}
+              `}
+              onClick={toggleMute}
+            >
+              {isMuted ? (
+                <VolumeX className="h-4 w-4" />
+              ) : (
+                <Volume2 className="h-4 w-4" />
+              )}
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  )
+}
