@@ -1,8 +1,9 @@
 
 generator client {
-    provider = "prisma-client-js"
-    binaryTargets = ["native", "linux-musl-arm64-openssl-3.0.x"]
-    output = "/home/ubuntu/atlas_maximus_app/nextjs_space/node_modules/.prisma/client"
+  provider     = "prisma-client-js"
+  // Optional: keep binaryTargets if you need them for Docker; otherwise you can delete this line too
+  binaryTargets = ["native", "linux-musl-arm64-openssl-3.0.x"]
+  // No custom output path – use the default inside node_modules
 }
 
 datasource db {
