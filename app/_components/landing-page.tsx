@@ -1,4 +1,3 @@
-
 "use client"
 
 import { useSession } from "next-auth/react"
@@ -6,7 +5,22 @@ import { useRouter } from "next/navigation"
 import { useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
-import { MessageCircle, Upload, Users, Zap, Star, ChevronRight, Workflow, FileText, Lightbulb, TrendingUp, BookOpen, Mic, Share2, Target } from "lucide-react"
+import {
+  MessageCircle,
+  Upload,
+  Users,
+  Zap,
+  Star,
+  ChevronRight,
+  Workflow,
+  FileText,
+  Lightbulb,
+  TrendingUp,
+  BookOpen,
+  Mic,
+  Share2,
+  Target
+} from "lucide-react"
 import { AtlasLogo } from "@/components/ui/atlas-logo"
 import Image from "next/image"
 import Link from "next/link"
@@ -62,27 +76,34 @@ export function LandingPage() {
       <section className="py-20 text-center">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="mx-auto mb-8 flex justify-center drop-shadow-2xl">
-            <AtlasLogo width={128} height={128} alt="Atlas Maximus - AI-Powered Agile Learning Avatar" />
+            <AtlasLogo
+              width={128}
+              height={128}
+              alt="Atlas Maximus - AI-Powered Agile Learning Avatar"
+            />
           </div>
-          
+
           <h1 className="text-5xl font-bold text-gray-900 mb-6">
-            Your AI-Powered <span className="text-blue-600">Agile Coach</span> & <span className="text-purple-600">Program Companion</span>
+            Your AI-Powered <span className="text-blue-600">Agile Coach</span> &{" "}
+            <span className="text-purple-600">Program Companion</span>
           </h1>
           <p className="text-xl text-gray-700 mb-4 max-w-3xl mx-auto">
-            Atlas Maximus delivers <strong>role-based coaching</strong>, <strong>predictive analytics</strong>, <strong>risk modeling</strong>, 
-            and <strong>executive-ready outputs</strong> — all powered by your real Agile data.
+            Atlas Maximus delivers <strong>role-based coaching</strong>,{" "}
+            <strong>predictive analytics</strong>, <strong>risk modeling</strong>, and{" "}
+            <strong>executive-ready outputs</strong> — all powered by your real Agile data.
           </p>
           <p className="text-lg text-gray-600 italic mb-2 max-w-2xl mx-auto">
-            "Built for Scrum Masters, Agile Coaches, RTEs, and Portfolio Leaders who demand insight, not noise."
+            "Built for Scrum Masters, Agile Coaches, RTEs, and Portfolio Leaders who demand insight,
+            not noise."
           </p>
           <p className="text-2xl font-semibold text-blue-600 mb-8 max-w-2xl mx-auto">
             Plan smarter. Deliver faster. Lead with confidence.
           </p>
-          
+
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
             <Link href="/auth/signup">
               <Button size="lg" className="bg-blue-600 hover:bg-blue-700 text-white px-8">
-                Start Free Trial
+                Get Started with Atlas
                 <ChevronRight className="ml-2 h-5 w-5" />
               </Button>
             </Link>
@@ -92,7 +113,10 @@ export function LandingPage() {
               </Button>
             </Link>
           </div>
-          <p className="text-sm text-gray-500 mt-4">Start at $10/month • Cancel anytime • No credit card required for demo</p>
+          <p className="text-sm text-gray-500 mt-4 max-w-xl mx-auto">
+            Atlas Maximus access is available exclusively through your NextGen Solutions &
+            Consulting subscription.
+          </p>
         </div>
       </section>
 
@@ -106,9 +130,7 @@ export function LandingPage() {
                   <MessageCircle className="h-8 w-8 text-white" />
                 </div>
                 <h3 className="text-lg font-bold mb-2">Personalized Coaching</h3>
-                <p className="text-gray-700 text-sm">
-                  Ask Atlas anything. Get role-specific answers.
-                </p>
+                <p className="text-gray-700 text-sm">Ask Atlas anything. Get role-specific answers.</p>
               </CardContent>
             </Card>
 
@@ -139,8 +161,18 @@ export function LandingPage() {
             <Card className="border-0 shadow-lg hover:shadow-xl transition-shadow bg-gradient-to-br from-orange-50 to-orange-100">
               <CardContent className="p-6 text-center">
                 <div className="bg-orange-600 rounded-full p-3 w-16 h-16 mx-auto mb-4 flex items-center justify-center">
-                  <svg className="h-8 w-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+                  <svg
+                    className="h-8 w-8 text-white"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"
+                    />
                   </svg>
                 </div>
                 <h3 className="text-lg font-bold mb-2">Memory & Recall</h3>
@@ -162,7 +194,7 @@ export function LandingPage() {
           <p className="text-lg text-gray-600 text-center mb-12 max-w-2xl mx-auto">
             Stop settling for generic answers and siloed dashboards
           </p>
-          
+
           <div className="grid md:grid-cols-2 gap-8">
             {/* Other Tools */}
             <Card className="border-2 border-red-200 bg-red-50/30">
@@ -210,23 +242,33 @@ export function LandingPage() {
                 <ul className="space-y-4">
                   <li className="flex items-start">
                     <span className="text-green-600 mr-3 text-xl font-bold">✓</span>
-                    <span className="text-gray-700"><strong>Role-based coaching</strong> from a trained AI avatar</span>
+                    <span className="text-gray-700">
+                      <strong>Role-based coaching</strong> from a trained AI avatar
+                    </span>
                   </li>
                   <li className="flex items-start">
                     <span className="text-green-600 mr-3 text-xl font-bold">✓</span>
-                    <span className="text-gray-700"><strong>Built-in SAFe + Scrum</strong> best practices</span>
+                    <span className="text-gray-700">
+                      <strong>Built-in SAFe + Scrum</strong> best practices
+                    </span>
                   </li>
                   <li className="flex items-start">
                     <span className="text-green-600 mr-3 text-xl font-bold">✓</span>
-                    <span className="text-gray-700"><strong>Integrated risk</strong> + confidence models</span>
+                    <span className="text-gray-700">
+                      <strong>Integrated risk</strong> + confidence models
+                    </span>
                   </li>
                   <li className="flex items-start">
                     <span className="text-green-600 mr-3 text-xl font-bold">✓</span>
-                    <span className="text-gray-700"><strong>Real-time analytics</strong> + team heatmaps</span>
+                    <span className="text-gray-700">
+                      <strong>Real-time analytics</strong> + team heatmaps
+                    </span>
                   </li>
                   <li className="flex items-start">
                     <span className="text-green-600 mr-3 text-xl font-bold">✓</span>
-                    <span className="text-gray-700"><strong>One-click PDF & PPT</strong> readouts for leadership</span>
+                    <span className="text-gray-700">
+                      <strong>One-click PDF &amp; PPT</strong> readouts for leadership
+                    </span>
                   </li>
                 </ul>
               </CardContent>
@@ -241,7 +283,8 @@ export function LandingPage() {
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold text-gray-900 mb-4">Built For Agile Professionals</h2>
             <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              Whether you're leading ceremonies, refining backlogs, or scaling practices, Atlas has you covered
+              Whether you're leading ceremonies, refining backlogs, or scaling practices, Atlas has
+              you covered
             </p>
           </div>
 
@@ -253,7 +296,8 @@ export function LandingPage() {
                 </div>
                 <h3 className="text-lg font-bold mb-2">Scrum Masters</h3>
                 <p className="text-gray-600 text-sm">
-                  Improve cadence and ceremonies with instant retrospective reports, sprint planning guidance, and team health checks
+                  Improve cadence and ceremonies with instant retrospective reports, sprint planning
+                  guidance, and team health checks
                 </p>
               </CardContent>
             </Card>
@@ -265,7 +309,8 @@ export function LandingPage() {
                 </div>
                 <h3 className="text-lg font-bold mb-2">Product Owners</h3>
                 <p className="text-gray-600 text-sm">
-                  Refine backlogs and objectives with user story workshops, INVEST criteria checks, and prioritization frameworks
+                  Refine backlogs and objectives with user story workshops, INVEST criteria checks,
+                  and prioritization frameworks
                 </p>
               </CardContent>
             </Card>
@@ -277,7 +322,8 @@ export function LandingPage() {
                 </div>
                 <h3 className="text-lg font-bold mb-2">Agile Coaches</h3>
                 <p className="text-gray-600 text-sm">
-                  Scale consistent practices across teams with training decks, coaching templates, and maturity assessments
+                  Scale consistent practices across teams with training decks, coaching templates,
+                  and maturity assessments
                 </p>
               </CardContent>
             </Card>
@@ -287,9 +333,10 @@ export function LandingPage() {
                 <div className="bg-orange-100 rounded-lg p-3 w-12 h-12 mb-4 flex items-center justify-center">
                   <Workflow className="h-6 w-6 text-orange-600" />
                 </div>
-                <h3 className="text-lg font-bold mb-2">RTEs & STEs</h3>
+                <h3 className="text-lg font-bold mb-2">RTEs &amp; STEs</h3>
                 <p className="text-gray-600 text-sm">
-                  Prepare for PI Planning and Inspect & Adapt with program-level briefings, dependency analysis, and risk reports
+                  Prepare for PI Planning and Inspect &amp; Adapt with program-level briefings,
+                  dependency analysis, and risk reports
                 </p>
               </CardContent>
             </Card>
@@ -301,7 +348,8 @@ export function LandingPage() {
                 </div>
                 <h3 className="text-lg font-bold mb-2">Leadership</h3>
                 <p className="text-gray-600 text-sm">
-                  Get fast readouts and decision summaries with compliance risk assessments and executive-ready reports
+                  Get fast readouts and decision summaries with compliance risk assessments and
+                  executive-ready reports
                 </p>
               </CardContent>
             </Card>
@@ -311,9 +359,10 @@ export function LandingPage() {
                 <div className="bg-cyan-100 rounded-lg p-3 w-12 h-12 mb-4 flex items-center justify-center">
                   <BookOpen className="h-6 w-6 text-cyan-600" />
                 </div>
-                <h3 className="text-lg font-bold mb-2">Teams & Developers</h3>
+                <h3 className="text-lg font-bold mb-2">Teams &amp; Developers</h3>
                 <p className="text-gray-600 text-sm">
-                  Learn Agile practices, get instant answers to methodology questions, and access reference materials on-demand
+                  Learn Agile practices, get instant answers to methodology questions, and access
+                  reference materials on-demand
                 </p>
               </CardContent>
             </Card>
@@ -327,7 +376,7 @@ export function LandingPage() {
           <h2 className="text-3xl font-bold text-center text-gray-900 mb-12">
             Why Choose Atlas Maximus?
           </h2>
-          
+
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
             <Card className="border-0 shadow-lg hover:shadow-xl transition-shadow bg-white">
               <CardContent className="p-6 text-center">
@@ -388,7 +437,8 @@ export function LandingPage() {
               Everything You Need to Master Agile
             </h2>
             <p className="text-lg text-gray-600 max-w-3xl mx-auto">
-              Atlas Maximus combines AI-powered learning with practical workflows to help you excel in your Agile journey
+              Atlas Maximus combines AI-powered learning with practical workflows to help you excel
+              in your Agile journey
             </p>
           </div>
 
@@ -402,37 +452,57 @@ export function LandingPage() {
                   </div>
                   <div>
                     <h3 className="text-xl font-bold text-gray-900 mb-2">7 Structured Workflows</h3>
-                    <p className="text-gray-600">Execute multi-step processes that produce tangible deliverables</p>
+                    <p className="text-gray-600">
+                      Execute multi-step processes that produce tangible deliverables
+                    </p>
                   </div>
                 </div>
                 <ul className="space-y-3 text-sm">
                   <li className="flex items-start">
                     <Target className="h-4 w-4 text-orange-600 mr-2 mt-0.5 flex-shrink-0" />
-                    <span><strong>PI Planning Briefing:</strong> Complete program increment planning packages</span>
+                    <span>
+                      <strong>PI Planning Briefing:</strong> Complete program increment planning
+                      packages
+                    </span>
                   </li>
                   <li className="flex items-start">
                     <Target className="h-4 w-4 text-orange-600 mr-2 mt-0.5 flex-shrink-0" />
-                    <span><strong>Compliance Risk Assessment:</strong> Risk scoring and mitigation strategies</span>
+                    <span>
+                      <strong>Compliance Risk Assessment:</strong> Risk scoring and mitigation
+                      strategies
+                    </span>
                   </li>
                   <li className="flex items-start">
                     <Target className="h-4 w-4 text-orange-600 mr-2 mt-0.5 flex-shrink-0" />
-                    <span><strong>Decision Summary:</strong> Structured decision documentation with RACI</span>
+                    <span>
+                      <strong>Decision Summary:</strong> Structured decision documentation with RACI
+                    </span>
                   </li>
                   <li className="flex items-start">
                     <Target className="h-4 w-4 text-orange-600 mr-2 mt-0.5 flex-shrink-0" />
-                    <span><strong>Training Deck Creation:</strong> Professional PowerPoint presentations</span>
+                    <span>
+                      <strong>Training Deck Creation:</strong> Professional PowerPoint presentations
+                    </span>
                   </li>
                   <li className="flex items-start">
                     <Target className="h-4 w-4 text-orange-600 mr-2 mt-0.5 flex-shrink-0" />
-                    <span><strong>Sprint Retrospective:</strong> Complete retro reports with action items</span>
+                    <span>
+                      <strong>Sprint Retrospective:</strong> Complete retro reports with action
+                      items
+                    </span>
                   </li>
                   <li className="flex items-start">
                     <Target className="h-4 w-4 text-orange-600 mr-2 mt-0.5 flex-shrink-0" />
-                    <span><strong>User Story Workshop:</strong> Story writing and refinement guidance</span>
+                    <span>
+                      <strong>User Story Workshop:</strong> Story writing and refinement guidance
+                    </span>
                   </li>
                   <li className="flex items-start">
                     <Target className="h-4 w-4 text-orange-600 mr-2 mt-0.5 flex-shrink-0" />
-                    <span><strong>Risk & Dependency Analysis:</strong> Visual dependency maps and mitigation plans</span>
+                    <span>
+                      <strong>Risk &amp; Dependency Analysis:</strong> Visual dependency maps and
+                      mitigation plans
+                    </span>
                   </li>
                 </ul>
               </CardContent>
@@ -446,30 +516,48 @@ export function LandingPage() {
                     <FileText className="h-6 w-6 text-white" />
                   </div>
                   <div>
-                    <h3 className="text-xl font-bold text-gray-900 mb-2">Downloadable Templates</h3>
-                    <p className="text-gray-600">Get professional templates in multiple formats with clickable links</p>
+                    <h3 className="text-xl font-bold text-gray-900 mb-2">
+                      Downloadable Templates
+                    </h3>
+                    <p className="text-gray-600">
+                      Get professional templates in multiple formats with clickable links
+                    </p>
                   </div>
                 </div>
                 <ul className="space-y-3 text-sm">
                   <li className="flex items-start">
                     <FileText className="h-4 w-4 text-green-600 mr-2 mt-0.5 flex-shrink-0" />
-                    <span><strong>Excel Templates:</strong> Sprint planning, velocity tracking, burndown charts</span>
+                    <span>
+                      <strong>Excel Templates:</strong> Sprint planning, velocity tracking, burndown
+                      charts
+                    </span>
                   </li>
                   <li className="flex items-start">
                     <FileText className="h-4 w-4 text-green-600 mr-2 mt-0.5 flex-shrink-0" />
-                    <span><strong>PowerPoint Decks:</strong> Training presentations, retrospective formats</span>
+                    <span>
+                      <strong>PowerPoint Decks:</strong> Training presentations, retrospective
+                      formats
+                    </span>
                   </li>
                   <li className="flex items-start">
                     <FileText className="h-4 w-4 text-green-600 mr-2 mt-0.5 flex-shrink-0" />
-                    <span><strong>Word Documents:</strong> Charter templates, definition of done, team agreements</span>
+                    <span>
+                      <strong>Word Documents:</strong> Charter templates, definition of done, team
+                      agreements
+                    </span>
                   </li>
                   <li className="flex items-start">
                     <FileText className="h-4 w-4 text-green-600 mr-2 mt-0.5 flex-shrink-0" />
-                    <span><strong>PDF Guides:</strong> Quick reference cards, process guides, checklists</span>
+                    <span>
+                      <strong>PDF Guides:</strong> Quick reference cards, process guides, checklists
+                    </span>
                   </li>
                   <li className="flex items-start">
                     <FileText className="h-4 w-4 text-green-600 mr-2 mt-0.5 flex-shrink-0" />
-                    <span><strong>On-Demand Generation:</strong> Atlas creates templates based on your requests</span>
+                    <span>
+                      <strong>On-Demand Generation:</strong> Atlas creates templates based on your
+                      requests
+                    </span>
                   </li>
                 </ul>
               </CardContent>
@@ -483,26 +571,42 @@ export function LandingPage() {
                     <Share2 className="h-6 w-6 text-white" />
                   </div>
                   <div>
-                    <h3 className="text-xl font-bold text-gray-900 mb-2">Community Knowledge Sharing</h3>
-                    <p className="text-gray-600">Learn from real experiences shared by other Agile practitioners</p>
+                    <h3 className="text-xl font-bold text-gray-900 mb-2">
+                      Community Knowledge Sharing
+                    </h3>
+                    <p className="text-gray-600">
+                      Learn from real experiences shared by other Agile practitioners
+                    </p>
                   </div>
                 </div>
                 <ul className="space-y-3 text-sm">
                   <li className="flex items-start">
                     <Lightbulb className="h-4 w-4 text-purple-600 mr-2 mt-0.5 flex-shrink-0" />
-                    <span><strong>Shared Experiences:</strong> Atlas learns from user contributions across the community</span>
+                    <span>
+                      <strong>Shared Experiences:</strong> Atlas learns from user contributions
+                      across the community
+                    </span>
                   </li>
                   <li className="flex items-start">
                     <Lightbulb className="h-4 w-4 text-purple-600 mr-2 mt-0.5 flex-shrink-0" />
-                    <span><strong>Real-World Solutions:</strong> Practical insights from practitioners facing similar challenges</span>
+                    <span>
+                      <strong>Real-World Solutions:</strong> Practical insights from practitioners
+                      facing similar challenges
+                    </span>
                   </li>
                   <li className="flex items-start">
                     <Lightbulb className="h-4 w-4 text-purple-600 mr-2 mt-0.5 flex-shrink-0" />
-                    <span><strong>Continuous Improvement:</strong> Atlas gets smarter with every contribution</span>
+                    <span>
+                      <strong>Continuous Improvement:</strong> Atlas gets smarter with every
+                      contribution
+                    </span>
                   </li>
                   <li className="flex items-start">
                     <Lightbulb className="h-4 w-4 text-purple-600 mr-2 mt-0.5 flex-shrink-0" />
-                    <span><strong>Context-Aware Advice:</strong> Recommendations based on similar situations</span>
+                    <span>
+                      <strong>Context-Aware Advice:</strong> Recommendations based on similar
+                      situations
+                    </span>
                   </li>
                 </ul>
               </CardContent>
@@ -516,30 +620,46 @@ export function LandingPage() {
                     <MessageCircle className="h-6 w-6 text-white" />
                   </div>
                   <div>
-                    <h3 className="text-xl font-bold text-gray-900 mb-2">Interactive Voice & Text Learning</h3>
-                    <p className="text-gray-600">Choose your preferred learning style with voice or text</p>
+                    <h3 className="text-xl font-bold text-gray-900 mb-2">
+                      Interactive Voice &amp; Text Learning
+                    </h3>
+                    <p className="text-gray-600">
+                      Choose your preferred learning style with voice or text
+                    </p>
                   </div>
                 </div>
                 <ul className="space-y-3 text-sm">
                   <li className="flex items-start">
                     <Mic className="h-4 w-4 text-blue-600 mr-2 mt-0.5 flex-shrink-0" />
-                    <span><strong>Natural Voice Responses:</strong> High-quality AI voice reads responses aloud</span>
+                    <span>
+                      <strong>Natural Voice Responses:</strong> High-quality AI voice reads
+                      responses aloud
+                    </span>
                   </li>
                   <li className="flex items-start">
                     <Mic className="h-4 w-4 text-blue-600 mr-2 mt-0.5 flex-shrink-0" />
-                    <span><strong>Voice Input:</strong> Ask questions using your microphone</span>
+                    <span>
+                      <strong>Voice Input:</strong> Ask questions using your microphone
+                    </span>
                   </li>
                   <li className="flex items-start">
                     <BookOpen className="h-4 w-4 text-blue-600 mr-2 mt-0.5 flex-shrink-0" />
-                    <span><strong>Text Mode:</strong> Read responses at your own pace with markdown formatting</span>
+                    <span>
+                      <strong>Text Mode:</strong> Read responses at your own pace with markdown
+                      formatting
+                    </span>
                   </li>
                   <li className="flex items-start">
                     <MessageCircle className="h-4 w-4 text-blue-600 mr-2 mt-0.5 flex-shrink-0" />
-                    <span><strong>Conversational Interface:</strong> Natural back-and-forth dialogue</span>
+                    <span>
+                      <strong>Conversational Interface:</strong> Natural back-and-forth dialogue
+                    </span>
                   </li>
                   <li className="flex items-start">
                     <TrendingUp className="h-4 w-4 text-blue-600 mr-2 mt-0.5 flex-shrink-0" />
-                    <span><strong>Context Awareness:</strong> Atlas remembers your conversation history</span>
+                    <span>
+                      <strong>Context Awareness:</strong> Atlas remembers your conversation history
+                    </span>
                   </li>
                 </ul>
               </CardContent>
@@ -548,28 +668,38 @@ export function LandingPage() {
 
           {/* Additional Capabilities */}
           <div className="bg-white rounded-2xl shadow-xl p-8">
-            <h3 className="text-2xl font-bold text-gray-900 mb-6 text-center">Additional Capabilities</h3>
+            <h3 className="text-2xl font-bold text-gray-900 mb-6 text-center">
+              Additional Capabilities
+            </h3>
             <div className="grid md:grid-cols-3 gap-6">
               <div className="text-center">
                 <div className="bg-blue-100 rounded-full p-4 w-16 h-16 mx-auto mb-3 flex items-center justify-center">
                   <Upload className="h-8 w-8 text-blue-600" />
                 </div>
                 <h4 className="font-semibold mb-2">Document Intelligence</h4>
-                <p className="text-sm text-gray-600">Upload training docs, guides, and PDFs. Atlas extracts and learns from your content.</p>
+                <p className="text-sm text-gray-600">
+                  Upload training docs, guides, and PDFs. Atlas extracts and learns from your
+                  content.
+                </p>
               </div>
               <div className="text-center">
                 <div className="bg-purple-100 rounded-full p-4 w-16 h-16 mx-auto mb-3 flex items-center justify-center">
                   <Users className="h-8 w-8 text-purple-600" />
                 </div>
                 <h4 className="font-semibold mb-2">Role-Specific Guidance</h4>
-                <p className="text-sm text-gray-600">Tailored advice for Scrum Masters, Product Owners, Developers, Testers, and Coaches.</p>
+                <p className="text-sm text-gray-600">
+                  Tailored advice for Scrum Masters, Product Owners, Developers, Testers, and
+                  Coaches.
+                </p>
               </div>
               <div className="text-center">
                 <div className="bg-green-100 rounded-full p-4 w-16 h-16 mx-auto mb-3 flex items-center justify-center">
                   <Zap className="h-8 w-8 text-green-600" />
                 </div>
                 <h4 className="font-semibold mb-2">Instant Insights</h4>
-                <p className="text-sm text-gray-600">Real-time answers to Scrum, SAFe, and Agile questions with cited references.</p>
+                <p className="text-sm text-gray-600">
+                  Real-time answers to Scrum, SAFe, and Agile questions with cited references.
+                </p>
               </div>
             </div>
           </div>
@@ -580,9 +710,7 @@ export function LandingPage() {
       <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">
-              See What Atlas Generates
-            </h2>
+            <h2 className="text-3xl font-bold text-gray-900 mb-4">See What Atlas Generates</h2>
             <p className="text-lg text-gray-600 max-w-2xl mx-auto">
               Professional, ready-to-use deliverables in minutes, not hours
             </p>
@@ -602,7 +730,8 @@ export function LandingPage() {
               <CardContent className="p-6">
                 <h3 className="text-lg font-bold mb-2">PI Planning Briefing</h3>
                 <p className="text-gray-600 text-sm">
-                  Complete program increment planning packages with objectives, dependencies, and team capacity analysis
+                  Complete program increment planning packages with objectives, dependencies, and
+                  team capacity analysis
                 </p>
               </CardContent>
             </Card>
@@ -620,7 +749,8 @@ export function LandingPage() {
               <CardContent className="p-6">
                 <h3 className="text-lg font-bold mb-2">Compliance Risk Assessment</h3>
                 <p className="text-gray-600 text-sm">
-                  Color-coded risk matrices with severity analysis and mitigation strategies for regulatory compliance
+                  Color-coded risk matrices with severity analysis and mitigation strategies for
+                  regulatory compliance
                 </p>
               </CardContent>
             </Card>
@@ -638,7 +768,8 @@ export function LandingPage() {
               <CardContent className="p-6">
                 <h3 className="text-lg font-bold mb-2">User Story Workshop</h3>
                 <p className="text-gray-600 text-sm">
-                  Professional training materials with INVEST criteria, story decomposition frameworks, and workshop facilitation guides
+                  Professional training materials with INVEST criteria, story decomposition
+                  frameworks, and workshop facilitation guides
                 </p>
               </CardContent>
             </Card>
@@ -651,7 +782,7 @@ export function LandingPage() {
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold text-gray-900 mb-4">
-              Enterprise-Ready & Trustworthy
+              Enterprise-Ready &amp; Trustworthy
             </h2>
             <p className="text-lg text-gray-600 max-w-2xl mx-auto">
               Built with security, compliance, and industry standards in mind
@@ -666,10 +797,13 @@ export function LandingPage() {
                     <BookOpen className="h-6 w-6 text-blue-600" />
                   </div>
                   <div>
-                    <h3 className="text-xl font-bold text-gray-900 mb-2">Industry Framework Aligned</h3>
+                    <h3 className="text-xl font-bold text-gray-900 mb-2">
+                      Industry Framework Aligned
+                    </h3>
                     <p className="text-gray-600">
-                      Atlas cites <strong>Scrum Guide (2020)</strong> and <strong>SAFe 6.0</strong> sources, ensuring your coaching 
-                      and training align with current industry standards including ICAgile and Scrum Alliance frameworks.
+                      Atlas cites <strong>Scrum Guide (2020)</strong> and <strong>SAFe 6.0</strong>{" "}
+                      sources, ensuring your coaching and training align with current industry
+                      standards including ICAgile and Scrum Alliance frameworks.
                     </p>
                   </div>
                 </div>
@@ -680,15 +814,26 @@ export function LandingPage() {
               <CardContent className="p-8">
                 <div className="flex items-start space-x-4 mb-4">
                   <div className="bg-green-100 rounded-lg p-3 flex-shrink-0">
-                    <svg className="h-6 w-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                    <svg
+                      className="h-6 w-6 text-green-600"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+                      />
                     </svg>
                   </div>
                   <div>
-                    <h3 className="text-xl font-bold text-gray-900 mb-2">Private & Secure</h3>
+                    <h3 className="text-xl font-bold text-gray-900 mb-2">Private &amp; Secure</h3>
                     <p className="text-gray-600">
-                      All document analysis runs privately on secure infrastructure. <strong>Your files are never used to train AI</strong>, 
-                      and your organization's knowledge stays confidential.
+                      All document analysis runs privately on secure infrastructure.{" "}
+                      <strong>Your files are never used to train AI</strong>, and your
+                      organization's knowledge stays confidential.
                     </p>
                   </div>
                 </div>
@@ -699,15 +844,27 @@ export function LandingPage() {
               <CardContent className="p-8">
                 <div className="flex items-start space-x-4 mb-4">
                   <div className="bg-purple-100 rounded-lg p-3 flex-shrink-0">
-                    <svg className="h-6 w-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                    <svg
+                      className="h-6 w-6 text-purple-600"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
+                      />
                     </svg>
                   </div>
                   <div>
-                    <h3 className="text-xl font-bold text-gray-900 mb-2">Regulatory Compliant</h3>
+                    <h3 className="text-xl font-bold text-gray-900 mb-2">
+                      Regulatory Compliant
+                    </h3>
                     <p className="text-gray-600">
-                      Used by teams in <strong>financial and regulatory environments</strong> where compliance, audit trails, 
-                      and documentation standards are critical.
+                      Used by teams in <strong>financial and regulatory environments</strong> where
+                      compliance, audit trails, and documentation standards are critical.
                     </p>
                   </div>
                 </div>
@@ -723,8 +880,9 @@ export function LandingPage() {
                   <div>
                     <h3 className="text-xl font-bold text-gray-900 mb-2">Proven Track Record</h3>
                     <p className="text-gray-600">
-                      Trusted by <strong>Scrum Masters, RTEs, and Agile Coaches</strong> across multiple industries to deliver 
-                      consistent, high-quality coaching and training materials.
+                      Trusted by <strong>Scrum Masters, RTEs, and Agile Coaches</strong> across
+                      multiple industries to deliver consistent, high-quality coaching and training
+                      materials.
                     </p>
                   </div>
                 </div>
@@ -740,23 +898,26 @@ export function LandingPage() {
           <h2 className="text-3xl font-bold text-gray-900 mb-12">
             Trusted by Agile Professionals
           </h2>
-          
+
           <div className="grid md:grid-cols-3 gap-8">
             {[
               {
                 name: "Sarah Chen",
                 role: "Scrum Master",
-                content: "Atlas Maximus transformed how I approach sprint planning. The talking avatar makes learning engaging!"
+                content:
+                  "Atlas Maximus transformed how I approach sprint planning. The talking avatar makes learning engaging!"
               },
               {
                 name: "Mike Rodriguez",
                 role: "Product Owner",
-                content: "The document analysis feature helped me streamline our backlog refinement process significantly."
+                content:
+                  "The document analysis feature helped me streamline our backlog refinement process significantly."
               },
               {
                 name: "Lisa Thompson",
                 role: "Agile Coach",
-                content: "Perfect for both beginners and experienced professionals. The role-based guidance is spot-on."
+                content:
+                  "Perfect for both beginners and experienced professionals. The role-based guidance is spot-on."
               }
             ].map((testimonial, index) => (
               <Card key={index} className="border-0 shadow-lg bg-white">
@@ -778,242 +939,34 @@ export function LandingPage() {
         </div>
       </section>
 
-      {/* Pricing Section */}
+      {/* Access / Subscription Info (replaces pricing section) */}
       <section className="py-16 bg-gradient-to-br from-gray-50 to-blue-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">
-              Choose Your Plan
-            </h2>
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              Try it free, then scale to your entire organization
-            </p>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
-            {/* Free Demo Plan */}
-            <Card className="border-0 shadow-lg bg-white">
-              <CardContent className="p-8">
-                <div className="text-center mb-6">
-                  <h3 className="text-2xl font-bold text-gray-900 mb-2">Free Demo</h3>
-                  <div className="flex items-baseline justify-center mb-4">
-                    <span className="text-5xl font-bold text-gray-900">$0</span>
-                  </div>
-                  <p className="text-gray-600 text-sm">Try before you commit</p>
-                </div>
-
-                <ul className="space-y-4 mb-8">
-                  <li className="flex items-start">
-                    <svg className="h-5 w-5 text-blue-600 mr-2 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                    </svg>
-                    <span className="text-gray-700">AI Chatbot (Atlas)</span>
-                  </li>
-                  <li className="flex items-start">
-                    <svg className="h-5 w-5 text-blue-600 mr-2 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                    </svg>
-                    <span className="text-gray-700">Role-Specific Coaching</span>
-                  </li>
-                  <li className="flex items-start">
-                    <svg className="h-5 w-5 text-blue-600 mr-2 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                    </svg>
-                    <span className="text-gray-700">Ask Atlas w/ NLP</span>
-                  </li>
-                  <li className="flex items-start">
-                    <svg className="h-5 w-5 text-gray-400 mr-2 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                    </svg>
-                    <span className="text-gray-400">5 document uploads</span>
-                  </li>
-                  <li className="flex items-start">
-                    <svg className="h-5 w-5 text-gray-400 mr-2 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clipRule="evenodd" />
-                    </svg>
-                    <span className="text-gray-400 line-through">Analytics Dashboard</span>
-                  </li>
-                  <li className="flex items-start">
-                    <svg className="h-5 w-5 text-gray-400 mr-2 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clipRule="evenodd" />
-                    </svg>
-                    <span className="text-gray-400 line-through">Risk Modeling</span>
-                  </li>
-                </ul>
-
-                <Link href="/auth/login" className="block">
-                  <Button size="lg" variant="outline" className="w-full">
-                    Try Demo
-                  </Button>
-                </Link>
-                <p className="text-center text-sm text-gray-500 mt-4">No credit card required</p>
-              </CardContent>
-            </Card>
-            {/* Standard Plan - Highlighted */}
-            <Card className="border-2 border-blue-600 shadow-2xl bg-white relative transform md:scale-105">
-              <div className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
-                <span className="bg-blue-600 text-white px-4 py-1 rounded-full text-sm font-semibold">
-                  Most Popular
-                </span>
-              </div>
-              <CardContent className="p-8">
-                <div className="text-center mb-6">
-                  <h3 className="text-2xl font-bold text-gray-900 mb-2">Standard</h3>
-                  <div className="flex items-baseline justify-center mb-4">
-                    <span className="text-5xl font-bold text-gray-900">$10</span>
-                    <span className="text-gray-600 ml-2">/month</span>
-                  </div>
-                  <p className="text-gray-600 text-sm">Perfect for individuals</p>
-                </div>
-
-                <ul className="space-y-3 mb-8 text-sm">
-                  <li className="flex items-start">
-                    <svg className="h-5 w-5 text-blue-600 mr-2 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                    </svg>
-                    <span className="text-gray-700"><strong>Everything in Free Demo</strong></span>
-                  </li>
-                  <li className="flex items-start">
-                    <svg className="h-5 w-5 text-blue-600 mr-2 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                    </svg>
-                    <span className="text-gray-700"><strong>Unlimited</strong> document uploads</span>
-                  </li>
-                  <li className="flex items-start">
-                    <svg className="h-5 w-5 text-blue-600 mr-2 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                    </svg>
-                    <span className="text-gray-700">Confidence + Risk Modeling</span>
-                  </li>
-                  <li className="flex items-start">
-                    <svg className="h-5 w-5 text-blue-600 mr-2 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                    </svg>
-                    <span className="text-gray-700">Conversation Memory & Summaries</span>
-                  </li>
-                  <li className="flex items-start">
-                    <svg className="h-5 w-5 text-blue-600 mr-2 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                    </svg>
-                    <span className="text-gray-700">Analytics Dashboard</span>
-                  </li>
-                  <li className="flex items-start">
-                    <svg className="h-5 w-5 text-blue-600 mr-2 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                    </svg>
-                    <span className="text-gray-700">Workspace Collaboration</span>
-                  </li>
-                  <li className="flex items-start">
-                    <svg className="h-5 w-5 text-blue-600 mr-2 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                    </svg>
-                    <span className="text-gray-700">Export PDF/PPT/Reports</span>
-                  </li>
-                  <li className="flex items-start">
-                    <svg className="h-5 w-5 text-blue-600 mr-2 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                    </svg>
-                    <span className="text-gray-700">Risk Matrix & Heatmaps</span>
-                  </li>
-                  <li className="flex items-start">
-                    <svg className="h-5 w-5 text-blue-600 mr-2 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                    </svg>
-                    <span className="text-gray-700">Multi-Team Support</span>
-                  </li>
-                </ul>
-
-                <Link href="/auth/signup" className="block">
-                  <Button size="lg" className="w-full bg-blue-600 hover:bg-blue-700">
-                    Get Started
-                    <ChevronRight className="ml-2 h-5 w-5" />
-                  </Button>
-                </Link>
-                <p className="text-center text-sm text-gray-500 mt-4">Cancel anytime</p>
-              </CardContent>
-            </Card>
-
-            {/* Team / Enterprise Plan */}
-            <Card className="border-0 shadow-lg bg-white">
-              <CardContent className="p-8">
-                <div className="text-center mb-6">
-                  <h3 className="text-2xl font-bold text-gray-900 mb-2">Team / Enterprise</h3>
-                  <div className="flex items-baseline justify-center mb-4">
-                    <span className="text-3xl font-bold text-gray-900">Contact Us</span>
-                  </div>
-                  <p className="text-gray-600 text-sm">For 5+ users</p>
-                </div>
-
-                <ul className="space-y-3 mb-8 text-sm">
-                  <li className="flex items-start">
-                    <svg className="h-5 w-5 text-green-600 mr-2 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                    </svg>
-                    <span className="text-gray-700"><strong>Everything in Standard</strong></span>
-                  </li>
-                  <li className="flex items-start">
-                    <svg className="h-5 w-5 text-green-600 mr-2 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                    </svg>
-                    <span className="text-gray-700">SOC2/ISO-ready compliance</span>
-                  </li>
-                  <li className="flex items-start">
-                    <svg className="h-5 w-5 text-green-600 mr-2 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                    </svg>
-                    <span className="text-gray-700">Custom Branding / White Label</span>
-                  </li>
-                  <li className="flex items-start">
-                    <svg className="h-5 w-5 text-green-600 mr-2 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                    </svg>
-                    <span className="text-gray-700">API Access</span>
-                  </li>
-                  <li className="flex items-start">
-                    <svg className="h-5 w-5 text-green-600 mr-2 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                    </svg>
-                    <span className="text-gray-700">Custom Feature Requests</span>
-                  </li>
-                  <li className="flex items-start">
-                    <svg className="h-5 w-5 text-green-600 mr-2 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                    </svg>
-                    <span className="text-gray-700">Dedicated Onboarding</span>
-                  </li>
-                  <li className="flex items-start">
-                    <svg className="h-5 w-5 text-green-600 mr-2 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                    </svg>
-                    <span className="text-gray-700">Priority Support + SLA</span>
-                  </li>
-                  <li className="flex items-start">
-                    <svg className="h-5 w-5 text-green-600 mr-2 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                    </svg>
-                    <span className="text-gray-700">Private Deployments Available</span>
-                  </li>
-                </ul>
-
-                <a href="mailto:sales@atlasmaximus.ai?subject=Team%20Plan%20Inquiry&body=Hi,%20I'm%20interested%20in%20the%20Team%20plan%20for%20Atlas%20Maximus.%20Please%20contact%20me%20with%20more%20details.">
-                  <Button size="lg" variant="outline" className="w-full">
-                    Contact Sales
-                  </Button>
-                </a>
-                <p className="text-center text-sm text-gray-500 mt-4">Custom pricing for teams</p>
-              </CardContent>
-            </Card>
-          </div>
-
-          <div className="text-center mt-12">
-            <p className="text-gray-600 mb-2">All plans include 14-day money-back guarantee</p>
-            <p className="text-blue-600 font-semibold mb-4">Most users save 5–10 hours per sprint per team</p>
-            <Link href="/auth/signup">
-              <Button size="lg" className="bg-blue-600 hover:bg-blue-700 px-8">
-                Start Free with Professional
-                <ChevronRight className="ml-2 h-5 w-5" />
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <h2 className="text-3xl font-bold text-gray-900 mb-4">How to Get Atlas Maximus</h2>
+          <p className="text-lg text-gray-600 mb-6">
+            Atlas Maximus is available exclusively as part of the NextGen Solutions &amp; Consulting
+            platform.
+          </p>
+          <p className="text-base text-gray-600 mb-8">
+            Purchase your subscription through NextGen, then use your credentials to sign in and
+            start working with Atlas for Agile coaching, training, and program support.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+            <Link href="/auth/login">
+              <Button size="lg" variant="outline" className="px-8">
+                Existing Customer — Sign In
               </Button>
             </Link>
+            <a
+              href="https://your-nextgen-site-url.com"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <Button size="lg" className="bg-blue-600 hover:bg-blue-700 px-8">
+                Learn More on NextGen
+                <ChevronRight className="ml-2 h-5 w-5" />
+              </Button>
+            </a>
           </div>
         </div>
       </section>
@@ -1027,7 +980,7 @@ export function LandingPage() {
               <span className="text-xl font-bold">Atlas Maximus</span>
             </div>
             <p className="text-gray-400 text-sm">
-              © 2024 Atlas Maximus. All rights reserved.
+              © 2025 Atlas Maximus. All rights reserved.
             </p>
           </div>
         </div>
