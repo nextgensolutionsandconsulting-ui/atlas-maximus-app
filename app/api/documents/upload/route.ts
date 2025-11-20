@@ -1,6 +1,5 @@
 // ===============================
-//  FIXED DIGITALOCEAN SPACES UPLOAD ROUTE
-//  Full replacement for route.ts
+//  DIGITALOCEAN SPACES UPLOAD ROUTE (CLEAN + CORRECT)
 // ===============================
 
 export const dynamic = "force-dynamic";
@@ -13,30 +12,22 @@ import { randomUUID } from "crypto";
 import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
 
 // ------------------------------
-// RESOLVE ENV VARS
+// RESOLVE ENV VARS (ONLY S3_* ARE USED)
 // ------------------------------
-const region =
-  process.env.SPACES_REGION ||
-  process.env.AWS_S3_REGION ||
-  process.env.AWS_REGION;
+const region = process.env.S3_REGION;
+const endpoint = process.env.S3_ENDPOINT;
+const accessKeyId = process.env.S3_ACCESS_KEY_ID;
+const secretAccessKey = process.env.S3_SECRET_ACCESS_KEY;
+const bucket = process.env.S3_BUCKET;
 
-const endpoint =
-  process.env.SPACES_ENDPOINT ||
-  process.env.AWS_S3_ENDPOINT;
+// Construct public base URL
+// Example: https://atlas-maximus-storage.nyc3.digitaloceanspaces.com
+const publicBaseUrl =
+  bucket && region
+    ? `https://${bucket}.${region}.digitaloceanspaces.com`
+    : null;
 
-const accessKeyId =
-  process.env.SPACES_KEY ||
-  process.env.AWS_ACCESS_KEY_ID;
-
-const secretAccessKey =
-  process.env.SPACES_SECRET ||
-  process.env.AWS_SECRET_ACCESS_KEY;
-
-const bucket =
-  process.env.SPACES_BUCKET ||
-  process.env.UPLOAD_BUCKET;
-
-// Build S3 Client for DO Spaces
+// Build S3 Client
 const s3 =
   region && endpoint && accessKeyId && secretAccessKey
     ? new S3Client({
@@ -61,8 +52,9 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
+    // Validate storage configuration
     if (!s3 || !bucket) {
-      console.error("❌ Spaces not configured:", {
+      console.error("❌ Storage not configured:", {
         region,
         endpoint,
         hasKey: !!accessKeyId,
@@ -75,7 +67,6 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Read file
     const formData = await req.formData();
     const file = formData.get("file") as File;
 
@@ -83,7 +74,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "No file provided" }, { status: 400 });
     }
 
-    // Validate size (10MB)
+    // Validate size (10MB max)
     if (file.size > 10 * 1024 * 1024) {
       return NextResponse.json(
         { error: "File too large. Max size is 10MB" },
@@ -91,7 +82,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Validate type
+    // Allowed file types
     const allowedTypes = [
       "application/pdf",
       "application/msword",
@@ -122,24 +113,31 @@ export async function POST(req: NextRequest) {
     const ext = originalName.includes(".")
       ? originalName.substring(originalName.lastIndexOf("."))
       : "";
-    const key = `uploads/${Date.now()}-${randomUUID()}${ext}`;
+    const objectKey = `uploads/${Date.now()}-${randomUUID()}${ext}`;
 
-    // Upload to Spaces
+    // Upload to DigitalOcean Spaces
     await s3.send(
       new PutObjectCommand({
         Bucket: bucket,
-        Key: key,
+        Key: objectKey,
         Body: buffer,
         ContentType: file.type,
+        ACL: "public-read",
       })
     );
 
-    // Save document metadata
+    // Build full public URL
+    const cloudStoragePath =
+      publicBaseUrl != null
+        ? `${publicBaseUrl}/${objectKey}`
+        : objectKey; // fallback
+
+    // Save metadata
     const document = await prisma.document.create({
       data: {
         userId: session.user.id,
         originalName,
-        cloudStoragePath: key,
+        cloudStoragePath,
         fileType: file.type,
         fileSize: file.size,
         mimeType: file.type,
@@ -147,8 +145,8 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    // Start processing
-    processDocumentAsync(document.id, key, file.type);
+    // Kick off async processing
+    processDocumentAsync(document.id, cloudStoragePath, file.type);
 
     return NextResponse.json({
       message: "File uploaded successfully",
