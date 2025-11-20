@@ -1,4 +1,3 @@
-
 import { PrismaClient } from '@prisma/client'
 import bcrypt from 'bcryptjs'
 
@@ -7,16 +6,19 @@ const prisma = new PrismaClient()
 async function main() {
   console.log('🌱 Starting database seed...')
 
-  // Create admin test user
-  const adminPassword = await bcrypt.hash('johndoe123', 10)
+  // =======================================
+  // 🚨 CREATE NEW ADMIN ACCOUNT
+  // =======================================
+  const adminPassword = await bcrypt.hash('NextGen2025!', 10)
+
   const adminUser = await prisma.user.upsert({
-    where: { email: 'john@doe.com' },
+    where: { email: 'admin@nextgen.com' },
     update: {},
     create: {
-      email: 'john@doe.com',
+      email: 'admin@nextgen.com',
       password: adminPassword,
-      fullName: 'John Doe Admin',
-      name: 'John Doe Admin',
+      fullName: 'NextGen Admin',
+      name: 'NextGen Admin',
       agileRole: 'AGILE_COACH',
       isAdmin: true,
       subscriptionStatus: 'ACTIVE',
@@ -26,7 +28,13 @@ async function main() {
     }
   })
 
-  // Create some sample users with different roles
+  console.log('👤 Admin Created:')
+  console.log('   Email: admin@nextgen.com')
+  console.log('   Password: NextGen2025!')
+
+  // =======================================
+  // SAMPLE USERS
+  // =======================================
   const sampleUsers = [
     {
       email: 'sarah.smith@example.com',
@@ -62,7 +70,9 @@ async function main() {
     })
   }
 
-  // Seed Knowledge Base with Agile content
+  // =======================================
+  // KNOWLEDGE BASE ITEMS
+  // =======================================
   const knowledgeBaseItems = [
     {
       title: 'Scrum Framework Overview',
@@ -108,15 +118,15 @@ async function main() {
 
   for (const item of knowledgeBaseItems) {
     await prisma.knowledgeBase.upsert({
-      where: { 
-        title: item.title 
-      },
+      where: { title: item.title },
       update: {},
       create: item
     })
   }
 
-  // Create a sample conversation for the admin user
+  // =======================================
+  // SAMPLE CONVERSATION FOR ADMIN
+  // =======================================
   const sampleConversation = await prisma.conversation.create({
     data: {
       userId: adminUser.id,
@@ -125,7 +135,6 @@ async function main() {
     }
   })
 
-  // Add sample messages to the conversation
   const sampleMessages = [
     {
       conversationId: sampleConversation.id,
@@ -134,26 +143,26 @@ async function main() {
     },
     {
       conversationId: sampleConversation.id,
-      content: 'Hello! I\'d be happy to help you with sprint planning. Let me ask you a few questions to better understand your situation:\n\n1. How experienced is your team with Scrum practices?\n2. What\'s the typical length of your sprints?\n3. Do you have a well-defined product backlog?\n\nKnowing these details will help me provide more targeted guidance for your sprint planning process.',
+      content:
+        `Hello! I’d be happy to help you with sprint planning. Let me ask you a few questions:\n
+1. How experienced is your team with Scrum?\n
+2. What’s your sprint length?\n
+3. Do you have a well-defined product backlog?\n
+Answering these helps me guide you more effectively.`,
       role: 'ASSISTANT' as const
     },
     {
       conversationId: sampleConversation.id,
-      content: 'The team is fairly new to Scrum - about half have some experience. We\'re planning 2-week sprints and our product backlog needs some refinement.',
+      content: 'The team is fairly new to Scrum. We’re planning 2-week sprints.',
       role: 'USER' as const
     }
   ]
 
   for (const message of sampleMessages) {
-    await prisma.message.create({
-      data: message
-    })
+    await prisma.message.create({ data: message })
   }
 
   console.log('✅ Database seeded successfully!')
-  console.log('👤 Admin user created: john@doe.com / johndoe123')
-  console.log('📚 Knowledge base populated with Agile content')
-  console.log('💬 Sample conversation created')
 }
 
 main()
