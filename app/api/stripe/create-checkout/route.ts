@@ -10,11 +10,7 @@ import Stripe from "stripe";
 // Build-safe Stripe init: don't throw if key is missing
 const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
 
-const stripe = stripeSecretKey
-  ? new Stripe(stripeSecretKey, {
-      apiVersion: "2024-06-20",
-    })
-  : null;
+const stripe = stripeSecretKey ? new Stripe(stripeSecretKey) : null;
 
 export async function POST(req: NextRequest) {
   try {
